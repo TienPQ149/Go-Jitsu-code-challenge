@@ -16,6 +16,7 @@
     "@tanstack/react-router": "^1.170.32",
     "@tanstack/react-virtual": "^3.14.10",
     "leaflet": "^1.9.4",
+    "openapi-fetch": "^0.17.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.86.0",
