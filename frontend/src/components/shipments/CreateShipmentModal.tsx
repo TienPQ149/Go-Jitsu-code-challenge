@@ -38,8 +38,8 @@ export function CreateShipmentModal({ onClose, onCreated }: CreateShipmentModalP
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-      <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-lg">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/30 p-4">
+      <div className="relative z-[1001] w-full max-w-sm rounded-lg bg-white p-5 shadow-lg">
         <h3 className="mb-4 text-base font-semibold text-gray-900">
           New shipment
         </h3>
