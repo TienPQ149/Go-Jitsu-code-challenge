@@ -8,7 +8,7 @@ import {
   type CreateAssignmentPayload,
   type ListAssignmentsParams,
 } from "../api/assignments.api";
-import { queryKeys } from "./queryKeys";
+import { queryKeys } from "../constants/queryKeys";
 
 export function useAssignments(params: ListAssignmentsParams = {}) {
   return useQuery({

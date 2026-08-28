@@ -8,7 +8,7 @@ import {
   type TransitionShipmentStatusPayload,
   type UpdateShipmentPayload,
 } from "../api/shipments.api";
-import { queryKeys } from "./queryKeys";
+import { queryKeys } from "../constants/queryKeys";
 
 /** Invalidates every shipment list + the given detail, and (since a status
  * transition can move a shipment in/out of an assignment) all assignment

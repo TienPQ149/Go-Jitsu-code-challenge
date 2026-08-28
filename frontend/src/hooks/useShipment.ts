@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getShipment, getValidTransitions } from "../api/shipments.api";
-import { queryKeys } from "./queryKeys";
+import { queryKeys } from "../constants/queryKeys";
 
 export function useShipment(id: string | undefined) {
   return useQuery({

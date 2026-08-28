@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { listShipments, type ListShipmentsParams } from "../api/shipments.api";
-import { queryKeys } from "./queryKeys";
+import { queryKeys } from "../constants/queryKeys";
 
 /**
  * Fetches a page of shipments from the server (status filter, search, and

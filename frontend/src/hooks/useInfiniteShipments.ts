@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { listShipments } from "../api/shipments.api";
 import type { ShipmentStatus } from "../types/domain";
-import { queryKeys } from "./queryKeys";
+import { queryKeys } from "../constants/queryKeys";
 
 const PAGE_SIZE = 50;
 
