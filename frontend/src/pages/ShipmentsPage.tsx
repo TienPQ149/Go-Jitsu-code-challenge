@@ -22,7 +22,7 @@ export function ShipmentsPage() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-full">
       <div className="w-96 shrink-0 flex flex-col">
         <div className="flex items-center justify-between border-b border-gray-200 px-4 py-2">
           <h1 className="text-sm font-semibold text-gray-900">Shipments</h1>

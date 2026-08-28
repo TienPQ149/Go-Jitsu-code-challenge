@@ -1,13 +1,20 @@
 import { useNavigate, useSearch } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   useAssignment,
   useAssignments,
+  useCreateAssignment,
+  useDeleteAssignment,
   useAssignmentShipments,
 } from "../hooks/useAssignments";
 
 export function AssignmentsPage() {
   const search = useSearch({ from: "/assignments" });
   const navigate = useNavigate({ from: "/assignments" });
+  const [newLabel, setNewLabel] = useState("");
+
+  const createAssignmentMutation = useCreateAssignment();
+  const deleteAssignmentMutation = useDeleteAssignment();
 
   const { data: assignments, isLoading, isError } = useAssignments({
     status: search.status,
@@ -40,10 +47,55 @@ export function AssignmentsPage() {
     navigate({ search: (prev) => ({ ...prev, selected: id }) });
   };
 
+  const handleCreateAssignment = () => {
+    const label = newLabel.trim();
+    if (!label) return;
+
+    createAssignmentMutation.mutate(
+      { label },
+      {
+        onSuccess: (created) => {
+          setNewLabel("");
+          if (created?.id) {
+            navigate({ search: (prev) => ({ ...prev, selected: created.id }) });
+          }
+        },
+      }
+    );
+  };
+
+  const handleDeleteAssignment = () => {
+    if (!selectedAssignment) return;
+    if (!window.confirm(`Delete assignment "${selectedAssignment.label}"?`)) return;
+
+    deleteAssignmentMutation.mutate(selectedAssignment.id, {
+      onSuccess: () => {
+        navigate({ search: (prev) => ({ ...prev, selected: undefined }) });
+      },
+    });
+  };
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-full">
       <div className="w-96 shrink-0 border-r border-gray-200">
         <div className="space-y-2 border-b border-gray-200 p-3">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="New assignment label"
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+            <button
+              type="button"
+              onClick={handleCreateAssignment}
+              disabled={!newLabel.trim() || createAssignmentMutation.isPending}
+              className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {createAssignmentMutation.isPending ? "Creating…" : "Create"}
+            </button>
+          </div>
           <input
             type="text"
             placeholder="Search assignments..."
@@ -60,6 +112,9 @@ export function AssignmentsPage() {
             <option value="OPEN">OPEN</option>
             <option value="COMPLETED">COMPLETED</option>
           </select>
+          {createAssignmentMutation.isError && (
+            <p className="text-xs text-red-600">Failed to create assignment.</p>
+          )}
         </div>
 
         <div className="h-[calc(100vh-114px)] overflow-y-auto">
@@ -102,9 +157,26 @@ export function AssignmentsPage() {
           <div className="text-sm text-red-600">Assignment not found.</div>
         ) : (
           <div className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{selectedAssignment.label}</h2>
-              <p className="text-sm text-gray-500">{selectedAssignment.id}</p>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">{selectedAssignment.label}</h2>
+                <p className="text-sm text-gray-500">{selectedAssignment.id}</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleDeleteAssignment}
+                disabled={
+                  deleteAssignmentMutation.isPending || selectedAssignment.shipment_count > 0
+                }
+                className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                title={
+                  selectedAssignment.shipment_count > 0
+                    ? "Cannot delete: assignment still has shipments"
+                    : "Delete assignment"
+                }
+              >
+                {deleteAssignmentMutation.isPending ? "Deleting…" : "Delete"}
+              </button>
             </div>
 
             <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -124,6 +196,9 @@ export function AssignmentsPage() {
 
             <div>
               <h3 className="mb-2 text-sm font-semibold text-gray-900">Shipments</h3>
+              {deleteAssignmentMutation.isError && (
+                <p className="mb-2 text-sm text-red-600">Failed to delete assignment.</p>
+              )}
               {isLoadingShipments ? (
                 <p className="text-sm text-gray-400">Loading shipments…</p>
               ) : shipments && shipments.length > 0 ? (
