@@ -61,32 +61,18 @@ This document records the technology choices made for the frontend of this proje
   per shipment's lat/lng. Requires a small manual fix for marker icon asset paths under Vite's
   bundling (a well-known react-leaflet + Vite compatibility workaround).
 
-## API types: OpenAPI + codegen (not a shared monorepo package)
-
-Two options were considered for keeping frontend and backend types in sync:
-
-- **Option A (chosen): OpenAPI spec + codegen.** The backend generates an OpenAPI document from its
-  Zod schemas (`@asteasolutions/zod-to-openapi`), served at `/docs/json` (Swagger UI at `/docs`).
-  The frontend runs `npm run gen-api` (`openapi-typescript`) against that endpoint to produce
-  `src/api/schema.d.ts`, and `openapi-fetch` provides a fully-typed HTTP client from those types.
-- **Option B (rejected): shared package in a monorepo**, with both frontend and backend importing
-  types from a common workspace package.
-
-Chosen Option A because the backend is a small, mostly-static addition for this exercise (not
-expected to change much going forward), so the one-way codegen step is simpler than setting up
-monorepo tooling (workspaces, build ordering) for a shared package that would rarely change.
+## API types: OpenAPI + codegen 
 
 ## Package versions pinned for compatibility
 
-| Package | Version | Reason |
-|---|---|---|
-| `vite` | `^5.4.11` | v8 (rolldown-vite) had native binding errors on this machine |
-| `@vitejs/plugin-react` | `^4.3.4` | matches Vite 5 |
-| `typescript` | `^5.5.3` | `openapi-typescript` requires TS `^5.x`, not v6 |
-| `tailwindcss` | `^3.4.19` | v4 deliberately avoided for stability in this exercise's timeframe |
-| `@asteasolutions/zod-to-openapi` (backend) | `^7` | v9 requires Zod v4; project uses Zod v3 |
+| Package                                      | Version     | Reason                                                             |
+| -------------------------------------------- | ----------- | ------------------------------------------------------------------ |
+| `vite`                                     | `^5.4.11` | v8 (rolldown-vite) had native binding errors on this machine       |
+| `@vitejs/plugin-react`                     | `^4.3.4`  | matches Vite 5                                                     |
+| `typescript`                               | `^5.5.3`  | `openapi-typescript` requires TS `^5.x`, not v6                |
+| `tailwindcss`                              | `^3.4.19` | v4 deliberately avoided for stability in this exercise's timeframe |
+| `@asteasolutions/zod-to-openapi` (backend) | `^7`      | v9 requires Zod v4; project uses Zod v3                            |
 
 ## Environment
 
-- Node `v24.15.0` (via `nvm use 24.15.0`) — resolves `EBADENGINE` warnings seen with the default
-  Node v22.8.0 for some of the above packages.
+- Node `v24.15.0`

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useInfiniteShipments } from "../../hooks/useInfiniteShipments";
 import type { ShipmentStatus } from "../../types/domain";
@@ -8,6 +8,12 @@ const STATUS_LABELS: Record<ShipmentStatus, string> = {
   OPEN: "Open",
   IN_TRANSIT: "In Transit",
   DELIVERED: "Delivered",
+};
+
+const STATUS_HEADER_STYLES: Record<ShipmentStatus, string> = {
+  OPEN: "bg-amber-600 text-white",
+  IN_TRANSIT: "bg-blue-700 text-white",
+  DELIVERED: "bg-emerald-700 text-white",
 };
 
 interface ShipmentStatusGroupProps {
@@ -26,6 +32,7 @@ export function ShipmentStatusGroup({
   selectedId,
   onSelect,
 }: ShipmentStatusGroupProps) {
+  const [isOpen, setIsOpen] = useState(true);
   const {
     data,
     fetchNextPage,
@@ -56,7 +63,7 @@ export function ShipmentStatusGroup({
   // Fetch the next page once the virtualizer is about to render the
   // trailing "loading" placeholder row, i.e. the user scrolled near the end.
   useEffect(() => {
-    if (!lastVirtualItem) return;
+    if (!isOpen || !lastVirtualItem) return;
     if (
       lastVirtualItem.index >= shipments.length - 1 &&
       hasNextPage &&
@@ -64,30 +71,44 @@ export function ShipmentStatusGroup({
     ) {
       fetchNextPage();
     }
-  }, [lastVirtualItem, shipments.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [isOpen, lastVirtualItem, shipments.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
     <section className="border-b border-gray-200">
-      <header className="sticky top-0 z-10 flex items-center justify-between bg-gray-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-600">
-        <span>{STATUS_LABELS[status]}</span>
-        <span className="text-gray-400">{total}</span>
-      </header>
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isOpen}
+        className={`sticky top-0 z-10 flex w-full items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wide shadow-sm transition-colors ${STATUS_HEADER_STYLES[status]}`}
+      >
+        <span className="flex items-center gap-2">
+          <svg
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className={`h-3.5 w-3.5 shrink-0 transition-transform ${isOpen ? "rotate-90" : ""}`}
+          >
+            <path d="M7.05 4.05a1 1 0 0 1 1.414 0l5 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 1 1-1.414-1.414L11.586 10 7.05 5.464a1 1 0 0 1 0-1.414z" />
+          </svg>
+          {STATUS_LABELS[status]}
+        </span>
+        <span className="rounded-full bg-black/20 px-2 py-0.5 text-xs">{total}</span>
+      </button>
 
-      {isError && (
+      {isOpen && isError && (
         <div className="px-3 py-2 text-sm text-red-600">
           Failed to load {STATUS_LABELS[status].toLowerCase()} shipments.
         </div>
       )}
 
-      {!isError && isLoading && (
+      {isOpen && !isError && isLoading && (
         <div className="px-3 py-2 text-sm text-gray-400">Loading…</div>
       )}
 
-      {!isError && !isLoading && total === 0 && (
+      {isOpen && !isError && !isLoading && total === 0 && (
         <div className="px-3 py-2 text-sm text-gray-400">No shipments.</div>
       )}
 
-      {!isError && total > 0 && (
+      {isOpen && !isError && total > 0 && (
         <div
           ref={parentRef}
           className="overflow-y-auto"
