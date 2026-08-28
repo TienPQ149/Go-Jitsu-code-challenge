@@ -13,3 +13,4 @@ backend/data/*.json
 # frontend
 frontend/dist/
 frontend/.vite/
+frontend/coverage/
