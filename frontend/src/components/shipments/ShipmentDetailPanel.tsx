@@ -3,7 +3,9 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useShipment } from "../../hooks/useShipment";
-import { useUpdateShipment } from "../../hooks/useShipmentMutations";
+import { useDeleteShipment, useUpdateShipment } from "../../hooks/useShipmentMutations";
+import { ShipmentMap } from "../map/ShipmentMap";
+import { ShipmentStatusControl } from "./ShipmentStatusControl";
 
 const editShipmentSchema = z.object({
   delivery_by_date: z.string().min(1, "Required"),
@@ -15,6 +17,7 @@ type EditShipmentForm = z.infer<typeof editShipmentSchema>;
 
 interface ShipmentDetailPanelProps {
   shipmentId: string | undefined;
+  onDeleted: () => void;
 }
 
 /** Converts an ISO datetime string to the `YYYY-MM-DDTHH:mm` format `<input type="datetime-local">` expects. */
@@ -26,9 +29,10 @@ function toDatetimeLocalValue(iso: string): string {
   )}:${pad(date.getMinutes())}`;
 }
 
-export function ShipmentDetailPanel({ shipmentId }: ShipmentDetailPanelProps) {
+export function ShipmentDetailPanel({ shipmentId, onDeleted }: ShipmentDetailPanelProps) {
   const { data: shipment, isLoading, isError } = useShipment(shipmentId);
   const updateMutation = useUpdateShipment(shipmentId ?? "");
+  const deleteMutation = useDeleteShipment();
 
   const {
     register,
@@ -81,17 +85,39 @@ export function ShipmentDetailPanel({ shipmentId }: ShipmentDetailPanelProps) {
     });
   };
 
+  const handleDelete = () => {
+    if (!window.confirm(`Delete shipment "${shipment.label}"? This cannot be undone.`)) {
+      return;
+    }
+    deleteMutation.mutate(shipment.id, {
+      onSuccess: () => onDeleted(),
+    });
+  };
+
   return (
     <div className="h-full overflow-y-auto p-6">
-      <h2 className="text-lg font-semibold text-gray-900">{shipment.label}</h2>
-      <p className="text-sm text-gray-500 mb-4">{shipment.id}</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">{shipment.label}</h2>
+          <p className="text-sm text-gray-500 mb-4">{shipment.id}</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleteMutation.isPending}
+          className="rounded-md border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {deleteMutation.isPending ? "Deleting\u2026" : "Delete"}
+        </button>
+      </div>
+
+      <div className="mb-6">
+        <ShipmentStatusControl shipment={shipment} />
+      </div>
 
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-6">
         <dt className="text-gray-500">Client</dt>
         <dd className="text-gray-900">{shipment.client_name}</dd>
-
-        <dt className="text-gray-500">Status</dt>
-        <dd className="text-gray-900">{shipment.status}</dd>
 
         <dt className="text-gray-500">Arrival date</dt>
         <dd className="text-gray-900">
@@ -105,8 +131,12 @@ export function ShipmentDetailPanel({ shipmentId }: ShipmentDetailPanelProps) {
         <dd className="text-gray-900">{shipment.warehouse_id}</dd>
 
         <dt className="text-gray-500">Assignment</dt>
-        <dd className="text-gray-900">{shipment.assignment_id ?? "—"}</dd>
+        <dd className="text-gray-900">{shipment.assignment_id ?? "\u2014"}</dd>
       </dl>
+
+      <div className="mb-6">
+        <ShipmentMap lat={shipment.lat} lng={shipment.lng} label={shipment.label} />
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
