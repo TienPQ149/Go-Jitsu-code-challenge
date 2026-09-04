@@ -5,7 +5,12 @@ import { assignmentStore } from "../repositories/assignmentRepository";
 import { shipmentStore } from "../repositories/shipmentRepository";
 import { AppError } from "../utils/AppError";
 
-export function listAssignments(query: ListAssignmentsQuery): Assignment[] {
+export function listAssignments(query: ListAssignmentsQuery): {
+  data: Assignment[];
+  total: number;
+  page: number;
+  per_page: number;
+} {
   let items = assignmentStore.findAll();
 
   if (query.status) {
@@ -17,7 +22,13 @@ export function listAssignments(query: ListAssignmentsQuery): Assignment[] {
     items = items.filter((a) => a.label.toLowerCase().includes(term));
   }
 
-  return items;
+  const total = items.length;
+  const page = query._page ?? 1;
+  const perPage = query._per_page ?? (total || 1);
+  const start = (page - 1) * perPage;
+  const paged = query._page || query._per_page ? items.slice(start, start + perPage) : items;
+
+  return { data: paged, total, page, per_page: perPage };
 }
 
 export function getAssignmentOrThrow(id: string): Assignment {

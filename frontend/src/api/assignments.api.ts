@@ -4,6 +4,8 @@ import type { AssignmentStatus } from "../types/domain";
 export interface ListAssignmentsParams {
   status?: AssignmentStatus;
   search?: string;
+  _page?: number;
+  _per_page?: number;
 }
 
 export async function listAssignments(params: ListAssignmentsParams = {}) {

@@ -138,12 +138,19 @@ registry.registerPath({
   method: "get",
   path: "/assignments",
   tags: ["Assignments"],
-  summary: "List assignments (filter by status/search)",
+  summary: "List assignments (filter by status/search, paginate)",
   request: { query: listAssignmentsQuerySchema },
   responses: {
     200: {
-      description: "List of assignments",
-      ...jsonBody(z.array(assignmentSchema)),
+      description: "Paginated list of assignments",
+      ...jsonBody(
+        z.object({
+          data: z.array(assignmentSchema),
+          total: z.number(),
+          page: z.number(),
+          per_page: z.number(),
+        })
+      ),
     },
   },
 });

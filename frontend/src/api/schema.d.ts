@@ -433,12 +433,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List assignments (filter by status/search) */
+        /** List assignments (filter by status/search, paginate) */
         get: {
             parameters: {
                 query?: {
                     status?: "OPEN" | "COMPLETED";
                     search?: string;
+                    _page?: number;
+                    _per_page?: number;
                 };
                 header?: never;
                 path?: never;
@@ -446,13 +448,18 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description List of assignments */
+                /** @description Paginated list of assignments */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["Assignment"][];
+                        "application/json": {
+                            data: components["schemas"]["Assignment"][];
+                            total: number;
+                            page: number;
+                            per_page: number;
+                        };
                     };
                 };
             };

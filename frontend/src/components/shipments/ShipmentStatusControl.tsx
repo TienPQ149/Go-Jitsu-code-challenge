@@ -17,7 +17,8 @@ interface ShipmentStatusControlProps {
  */
 export function ShipmentStatusControl({ shipment }: ShipmentStatusControlProps) {
   const { data: transitions } = useValidTransitions(shipment.id);
-  const { data: assignments } = useAssignments({ status: "OPEN" });
+  const { data: assignmentsResult } = useAssignments({ status: "OPEN" });
+  const assignments = assignmentsResult?.data;
   const transitionMutation = useTransitionShipmentStatus(shipment.id);
 
   const [pendingStatus, setPendingStatus] = useState<ShipmentStatus | "">("");

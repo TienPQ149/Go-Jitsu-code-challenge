@@ -46,7 +46,7 @@ beforeEach(() => {
 describe("ShipmentStatusControl", () => {
   it("shows a message when there are no further transitions", () => {
     mockUseValidTransitions.mockReturnValue({ data: { valid_target_statuses: [] } });
-    mockUseAssignments.mockReturnValue({ data: [] });
+    mockUseAssignments.mockReturnValue({ data: { data: [], total: 0, page: 1, per_page: 1 } });
 
     render(<ShipmentStatusControl shipment={shipment} />);
 
@@ -57,7 +57,7 @@ describe("ShipmentStatusControl", () => {
     mockUseValidTransitions.mockReturnValue({
       data: { valid_target_statuses: ["IN_TRANSIT"] },
     });
-    mockUseAssignments.mockReturnValue({ data: [] });
+    mockUseAssignments.mockReturnValue({ data: { data: [], total: 0, page: 1, per_page: 1 } });
 
     render(<ShipmentStatusControl shipment={shipment} />);
 
@@ -69,7 +69,7 @@ describe("ShipmentStatusControl", () => {
     mockUseValidTransitions.mockReturnValue({
       data: { valid_target_statuses: ["IN_TRANSIT"] },
     });
-    mockUseAssignments.mockReturnValue({ data: [{ id: "as_1", label: "A1" }] });
+    mockUseAssignments.mockReturnValue({ data: { data: [{ id: "as_1", label: "A1" }], total: 1, page: 1, per_page: 1 } });
 
     render(<ShipmentStatusControl shipment={shipment} />);
 
@@ -86,7 +86,7 @@ describe("ShipmentStatusControl", () => {
     mockUseValidTransitions.mockReturnValue({
       data: { valid_target_statuses: ["IN_TRANSIT"] },
     });
-    mockUseAssignments.mockReturnValue({ data: [{ id: "as_1", label: "A1" }] });
+    mockUseAssignments.mockReturnValue({ data: { data: [{ id: "as_1", label: "A1" }], total: 1, page: 1, per_page: 1 } });
 
     render(<ShipmentStatusControl shipment={shipment} />);
 
@@ -106,7 +106,7 @@ describe("ShipmentStatusControl", () => {
     mockUseValidTransitions.mockReturnValue({
       data: { valid_target_statuses: ["IN_TRANSIT"] },
     });
-    mockUseAssignments.mockReturnValue({ data: [{ id: "as_1", label: "A1" }] });
+    mockUseAssignments.mockReturnValue({ data: { data: [{ id: "as_1", label: "A1" }], total: 1, page: 1, per_page: 1 } });
 
     render(<ShipmentStatusControl shipment={shipment} />);
 
@@ -126,7 +126,7 @@ describe("ShipmentStatusControl", () => {
     mockUseValidTransitions.mockReturnValue({
       data: { valid_target_statuses: ["DELIVERED"] },
     });
-    mockUseAssignments.mockReturnValue({ data: [] });
+    mockUseAssignments.mockReturnValue({ data: { data: [], total: 0, page: 1, per_page: 1 } });
 
     render(<ShipmentStatusControl shipment={{ ...shipment, status: "IN_TRANSIT" }} />);
 
@@ -146,7 +146,7 @@ describe("ShipmentStatusControl", () => {
     mockUseValidTransitions.mockReturnValue({
       data: { valid_target_statuses: ["IN_TRANSIT"] },
     });
-    mockUseAssignments.mockReturnValue({ data: [] });
+    mockUseAssignments.mockReturnValue({ data: { data: [], total: 0, page: 1, per_page: 1 } });
     mockUseTransitionShipmentStatus.mockReturnValue({
       mutate: mockMutate,
       isPending: false,
