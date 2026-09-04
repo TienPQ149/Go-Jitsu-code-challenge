@@ -18,8 +18,8 @@ const MAX_LAT = 33.05;
 const MIN_LNG = -97.4;
 const MAX_LNG = -96.5;
 
-const SHIPMENT_COUNT = 100;
-const ASSIGNMENT_COUNT = 20;
+const SHIPMENT_COUNT = 100000;
+const ASSIGNMENT_COUNT = 20000;
 
 function randomBetween(min: number, max: number): number {
   return Math.random() * (max - min) + min;
